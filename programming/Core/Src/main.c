@@ -68,6 +68,7 @@
 TIM_HandleTypeDef htim2;
 
 UART_HandleTypeDef huart1;
+DMA_HandleTypeDef hdma_usart1_rx;
 
 /* USER CODE BEGIN PV */
 
@@ -93,17 +94,12 @@ int		previous_millis = 0;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_DMA_Init(void);
 static void MX_TIM2_Init(void);
 static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
 
 void reset_rx_buffer(void);
-
-int map(int x, int in_min, int in_max, int out_min, int out_max);
-
-void servo_1_speed_control(uint8_t speed, int angle);
-
-void servo_2_speed_control(uint8_t speed, int angle);
 
 /* USER CODE END PFP */
 
@@ -170,6 +166,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_TIM2_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
@@ -181,6 +178,7 @@ int main(void)
   servo_motor servo_1 = {&htim2, TIM_CHANNEL_1, SERVO_1_MIN_PULSE, SERVO_1_MAX_PULSE};
 
   printf("start \r\n");
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -197,35 +195,13 @@ int main(void)
 
 	  if (data_received_flag == 1)
 	  {
+		  HAL_Delay(1000);
 		  printf(" servo_1_angle = %d \r\n", servo_1_angle);
 		  servo_set_angle_speed(&servo_1, servo_1_angle, 50);
 		  data_received_flag = 0;
 
 		  reset_rx_buffer();
 	  }
-	  /*
-	  if (data_received_flag == 1)
-	  {
-		  servo_1_angle = rx_buffer[0];
-		  servo_1_speed = rx_buffer[1];
-
-		  servo_2_angle = rx_buffer[2];
-		  servo_2_speed = rx_buffer[3];
-
-		  if((servo_1_angle > MIN_ANGLE) && (servo_1_angle < MAX_ANGLE))
-		  {
-			  servo_1_angle = map(servo_1_angle * 10, MIN_ANGLE, MAX_ANGLE * 10, SERVO_1_MIN_VALUE, SERVO_1_MAX_VALUE);
-		  }
-
-		  servo_1_speed_control(servo_1_speed, servo_1_angle);// check constraint for servo_1_speed
-
-		  servo_1_previous_angle = servo_1_angle;
-
-		  data_received_flag = 0;
-
-		  reset_rx_buffer();
-	  }
-*/
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -365,6 +341,22 @@ static void MX_USART1_UART_Init(void)
 }
 
 /**
+  * Enable DMA controller clock
+  */
+static void MX_DMA_Init(void)
+{
+
+  /* DMA controller clock enable */
+  __HAL_RCC_DMA1_CLK_ENABLE();
+
+  /* DMA interrupt init */
+  /* DMA1_Channel5_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Channel5_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel5_IRQn);
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -402,24 +394,7 @@ void reset_rx_buffer(void)
 	rx_index = 0;
 }
 
-int map(int x, int in_min, int in_max, int out_min, int out_max)
-{
-	return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-}
 
-
-
-void servo_1_speed_control(uint8_t speed, int angle)
-{
-	for(int i = servo_1_previous_angle; i < angle ; i = i + ANGLE_STEP)
-	{
-		__HAL_TIM_SetCompare(&htim2, TIM_CHANNEL_1, i);
-		HAL_Delay(speed);
-	}
-
-}
-
-void servo_2_speed_control(uint8_t speed, int angle);
 
 PUTCHAR_PROTOTYPE
 {
