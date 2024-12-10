@@ -1,4 +1,4 @@
-Core/Src/serial.o: ../Core/Src/serial.c ../Core/Inc/serial.h \
+Core/Src/loop.o: ../Core/Src/loop.c ../Core/Inc/loop.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h \
  ../Core/Inc/stm32f1xx_hal_conf.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h \
@@ -24,8 +24,8 @@ Core/Src/serial.o: ../Core/Src/serial.c ../Core/Inc/serial.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h \
- ../Core/Inc/Types.h
-../Core/Inc/serial.h:
+ ../Core/Inc/Types.h ../Core/Inc/servo_functions.h ../Core/Inc/serial.h
+../Core/Inc/loop.h:
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h:
 ../Core/Inc/stm32f1xx_hal_conf.h:
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h:
@@ -52,3 +52,5 @@ Core/Src/serial.o: ../Core/Src/serial.c ../Core/Inc/serial.h \
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h:
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h:
 ../Core/Inc/Types.h:
+../Core/Inc/servo_functions.h:
+../Core/Inc/serial.h:

@@ -23,10 +23,12 @@
 /* USER CODE BEGIN Includes */
 
 #include "stdio.h"
-#include "stdlib.h"
 
 #include "serial.h"
 #include "servo_functions.h"
+#include "loop.h"
+
+#include "Types.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -38,29 +40,16 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 
-#define RX_BUFFER_SIZE  50
 
-#define SERVO_1_MIN_PULSE 17500
-#define SERVO_1_MAX_PULSE 19500
+#define SERVO_1_MIN_PULSE 		17500
+#define SERVO_1_MAX_PULSE		19500
 
-#define MIN_ANGLE 0
-#define MAX_ANGLE 36
 
-#define ANGLE_STEP 50
 
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-	#ifdef __GNUC__
-		/* With GCC, small printf (option LD Linker->Libraries->Small printf
-			 set to 'Yes') calls __io_putchar() */
-		#define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
-		#define GETCHAR_PROTOTYPE int __io_getchar(void)
-	#else
-		#define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
-		#define GETCHAR_PROTOTYPE int fgetc(FILE *f)
-	#endif /* __GNUC__ */
 
 /* USER CODE END PM */
 
@@ -69,25 +58,13 @@ TIM_HandleTypeDef htim2;
 
 UART_HandleTypeDef huart1;
 DMA_HandleTypeDef hdma_usart1_rx;
+DMA_HandleTypeDef hdma_usart1_tx;
 
 /* USER CODE BEGIN PV */
 
-char 	rx_buffer[RX_BUFFER_SIZE];
-char 	rx_temp;
-uint8_t rx_index = 0;
-uint8_t data_received_flag = 0;
+uint8			rx_temp;
 
-
-int 	servo_1_angle,
-		servo_1_previous_angle,
-		servo_1_speed;
-
-int 	servo_2_angle,
-		servo_2_previous_angle,
-		servo_2_speed;
-
-
-int		previous_millis = 0;
+servo_motor		servo_1 = {&TIM2->CCR1, SERVO_1_MIN_PULSE, SERVO_1_MAX_PULSE};
 
 /* USER CODE END PV */
 
@@ -99,40 +76,10 @@ static void MX_TIM2_Init(void);
 static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
 
-void reset_rx_buffer(void);
-
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-{
-	if(huart == &huart1)
-	{
-		if(rx_temp == '\n') // character '\n' means end of received data
-		{
-			rx_buffer[rx_index] = '\0';
-
-			servo_1_angle = atoi((char *)rx_buffer);
-
-			data_received_flag = 1;
-		}
-		else
-		{
-			rx_buffer[rx_index] = rx_temp;
-			rx_index++;
-
-			if (rx_index > RX_BUFFER_SIZE)
-			{
-				rx_index = 0;
-			}
-		}
-
-		HAL_UART_Receive_IT(&huart1 , (uint8_t *)&rx_temp , 1);
-
-	}
-}
 
 
 /* USER CODE END 0 */
@@ -173,11 +120,11 @@ int main(void)
 
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
 
-  HAL_UART_Receive_IT(&huart1 , (uint8_t *)&rx_temp , 1);
+  HAL_UART_Receive_DMA(&huart1, &rx_temp, 1);
 
-  servo_motor servo_1 = {&htim2, TIM_CHANNEL_1, SERVO_1_MIN_PULSE, SERVO_1_MAX_PULSE};
 
-  printf("start \r\n");
+
+  printf("check uart \r\n");
 
   /* USER CODE END 2 */
 
@@ -185,23 +132,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  if(HAL_GetTick() - previous_millis > 500)// reset buffer every 500ms if invalid data have been received
-	  {
-		  reset_rx_buffer();
-
-		  previous_millis = HAL_GetTick();
-	  }
-
-
-	  if (data_received_flag == 1)
-	  {
-		  HAL_Delay(1000);
-		  printf(" servo_1_angle = %d \r\n", servo_1_angle);
-		  servo_set_angle_speed(&servo_1, servo_1_angle, 50);
-		  data_received_flag = 0;
-
-		  reset_rx_buffer();
-	  }
+	  loop();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -350,6 +281,9 @@ static void MX_DMA_Init(void)
   __HAL_RCC_DMA1_CLK_ENABLE();
 
   /* DMA interrupt init */
+  /* DMA1_Channel4_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Channel4_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel4_IRQn);
   /* DMA1_Channel5_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(DMA1_Channel5_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(DMA1_Channel5_IRQn);
@@ -388,22 +322,9 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 
-void reset_rx_buffer(void)
-{
-	memset(rx_buffer , 0 ,RX_BUFFER_SIZE);
-	rx_index = 0;
-}
 
 
 
-PUTCHAR_PROTOTYPE
-{
-  /* Place your implementation of fputc here */
-  /* e.g. write a character to the EVAL_COM1 and Loop until the end of transmission */
-  HAL_UART_Transmit(&huart1, (uint8_t *)&ch, 1, 0xFFFF);
-
-  return ch;
-}
 
 /* USER CODE END 4 */
 
