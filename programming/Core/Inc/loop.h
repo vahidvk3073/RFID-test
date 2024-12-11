@@ -15,6 +15,7 @@
 
 
 
-void		loop(void);
+void	loop(void);
+void	buffer_process(uint8 *buffer);
 
 #endif /* INC_LOOP_H_ */

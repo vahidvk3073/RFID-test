@@ -41,8 +41,7 @@
 /* USER CODE BEGIN PD */
 
 
-#define SERVO_1_MIN_PULSE 		17500
-#define SERVO_1_MAX_PULSE		19500
+
 
 
 
@@ -65,6 +64,7 @@ DMA_HandleTypeDef hdma_usart1_tx;
 uint8			rx_temp;
 
 servo_motor		servo_1 = {&TIM2->CCR1, SERVO_1_MIN_PULSE, SERVO_1_MAX_PULSE};
+servo_motor		servo_2 = {&TIM2->CCR2, SERVO_2_MIN_PULSE, SERVO_2_MAX_PULSE};
 
 /* USER CODE END PV */
 
@@ -228,6 +228,12 @@ static void MX_TIM2_Init(void)
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
   if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sConfigOC.OCMode = TIM_OCMODE_PWM1;
+  sConfigOC.Pulse = 0;
+  if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
   {
     Error_Handler();
   }

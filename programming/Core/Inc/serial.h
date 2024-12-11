@@ -12,7 +12,7 @@
 #include "Types.h"
 #include "stdio.h"
 
-#define		RX_BUFFER_SIZE		4
+#define		RX_BUFFER_SIZE		3
 
 extern UART_HandleTypeDef huart1;
 
@@ -29,9 +29,9 @@ extern UART_HandleTypeDef huart1;
 
 
 /*define function prototype*/
-void			HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
-void			HAL_DMA_RX_CpltCallback(DMA_HandleTypeDef *hdma);
-void			reset_rx_buffer(void);
+void	HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
+void	HAL_DMA_RX_CpltCallback(DMA_HandleTypeDef *hdma);
+void	reset_rx_buffer(void);
 
 
 #endif /* INC_SERIAL_H_ */
