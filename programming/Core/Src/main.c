@@ -61,10 +61,10 @@ DMA_HandleTypeDef hdma_usart1_tx;
 
 /* USER CODE BEGIN PV */
 
-uint8			rx_temp;
+uint8	rx_temp;
 
-servo_motor		servo_1 = {&TIM2->CCR1, SERVO_1_MIN_PULSE, SERVO_1_MAX_PULSE};
-servo_motor		servo_2 = {&TIM2->CCR2, SERVO_2_MIN_PULSE, SERVO_2_MAX_PULSE};
+ServoMotor	servo_1 = {&TIM2->CCR1, SERVO_1_MIN_PULSE, SERVO_1_MAX_PULSE};
+ServoMotor	servo_2 = {&TIM2->CCR2, SERVO_2_MIN_PULSE, SERVO_2_MAX_PULSE};
 
 /* USER CODE END PV */
 
@@ -122,7 +122,9 @@ int main(void)
 
   HAL_UART_Receive_DMA(&huart1, &rx_temp, 1);
 
-
+  TurnOnLED();
+  HAL_Delay(1000);
+  TurnOffLED();
 
   printf("check uart \r\n");
 
@@ -132,7 +134,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  loop();
+	  Loop();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -313,14 +315,14 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, LED_Pin|LEDB8_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pin : LED_Pin */
-  GPIO_InitStruct.Pin = LED_Pin;
+  /*Configure GPIO pins : LED_Pin LEDB8_Pin */
+  GPIO_InitStruct.Pin = LED_Pin|LEDB8_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(LED_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */

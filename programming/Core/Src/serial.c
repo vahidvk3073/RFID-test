@@ -12,7 +12,6 @@
 
 uint8			receiving					= 0;
 uint8			buffer_index				= 0;
-int				servo_1_angle;
 uint8			data_received_flag;
 
 uint8			rx_buffer[RX_BUFFER_SIZE];
@@ -48,7 +47,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	}
 }
 
-void reset_rx_buffer(void)
+void ResetRxBuffer(void)
 {
 	memset(rx_buffer , 0 ,RX_BUFFER_SIZE);
 	buffer_index = 0;

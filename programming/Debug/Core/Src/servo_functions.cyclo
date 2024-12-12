@@ -1,2 +1,2 @@
-../Core/Src/servo_functions.c:11:6:servo_set_angle_speed	1
-../Core/Src/servo_functions.c:24:8:calibrate_angle	2
+../Core/Src/servo_functions.c:11:6:ServoSetAngle	1
+../Core/Src/servo_functions.c:23:8:CalibrateAngle	2

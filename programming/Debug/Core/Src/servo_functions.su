@@ -1,2 +1,2 @@
-../Core/Src/servo_functions.c:11:6:servo_set_angle_speed	24	static
-../Core/Src/servo_functions.c:24:8:calibrate_angle	24	static
+../Core/Src/servo_functions.c:11:6:ServoSetAngle	24	static
+../Core/Src/servo_functions.c:23:8:CalibrateAngle	24	static

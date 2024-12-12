@@ -1,4 +1,4 @@
-Core/Src/loop.o: ../Core/Src/loop.c ../Core/Inc/loop.h \
+Core/Src/loop.o: ../Core/Src/loop.c ../Core/Inc/loop.h ../Core/Inc/main.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h \
  ../Core/Inc/stm32f1xx_hal_conf.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h \
@@ -26,6 +26,7 @@ Core/Src/loop.o: ../Core/Src/loop.c ../Core/Inc/loop.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h \
  ../Core/Inc/Types.h ../Core/Inc/servo_functions.h ../Core/Inc/serial.h
 ../Core/Inc/loop.h:
+../Core/Inc/main.h:
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h:
 ../Core/Inc/stm32f1xx_hal_conf.h:
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h:

@@ -1,2 +1,7 @@
-../Core/Src/loop.c:19:6:loop	8	static
-../Core/Src/loop.c:33:6:buffer_process	16	static
+../Core/Src/loop.c:24:6:Loop	8	static
+../Core/Src/loop.c:46:6:ServoSetSpeed	16	static
+../Core/Src/loop.c:71:6:BufferProcess	16	static
+../Core/Src/loop.c:98:6:Calibrate	16	static
+../Core/Src/loop.c:103:6:CalibrateSpeed	16	static
+../Core/Src/loop.c:120:6:TurnOnLED	8	static
+../Core/Src/loop.c:124:6:TurnOffLED	8	static
