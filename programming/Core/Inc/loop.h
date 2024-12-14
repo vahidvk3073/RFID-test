@@ -17,17 +17,21 @@ typedef struct
 {
 	uint8	motor_number;
 	uint8	angle;
-	uint8	previous_angle;
+	float	previous_angle;
 	uint8	speed;
+	uint8	MIN_ANGLE;
+	uint16	MAX_ANGLE;
 	uint32	previous_millis;
 }ServoValues;
 
 void	Loop(void);
 void	BufferProcess(uint8 *buffer);
-void	ServoSetSpeed(ServoMotor *servo, ServoValues *servo_values);
-void	CalibrateSpeed(uint8 speed);
+uint8	ServoSetSpeed(ServoMotor *servo, ServoValues *servo_values);
+void	CalibrateSpeed(ServoValues *servo_values);
+void	ResetServoValues(ServoMotor *servo, ServoValues *servo_values);
+void	Servo1Control(ServoMotor *servo, ServoValues *servo_values);
+void	Servo2Control(ServoMotor *servo, ServoValues *servo_values);
 
-void	Calibrate(ServoValues *servo_values);
 void	TurnOnLED(void);
 void	TurnOffLED(void);
 

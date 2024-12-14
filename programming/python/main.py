@@ -31,9 +31,9 @@ def servo_motor_control(motor_number, angle, speed):
 ser = serial.Serial(serial_port, baudrate, timeout=1)
 
 while True:
-    for i in range(0, 37, 6):
+    for i in range(6, 37, 6):
         # send data to motor 1
-        servo_motor_control(motor_number=1, angle=i, speed=50)
+        servo_motor_control(motor_number=1, angle=i, speed=20)
 
         # if "data received succussfully" in received_data:
         #     print('succussfully sent to motor 1')
@@ -45,9 +45,10 @@ while True:
         # if "data received succussfully" in received_data:
         #     print(f'succussfully sent to motor 2')
         #     print('============================================')
+
         start_time = time.time()
         while (time.time() - start_time < 3):
             received_data = ser.readline().decode()
             print(received_data)
-            
-        time.sleep(5)
+
+        time.sleep(4)

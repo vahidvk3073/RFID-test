@@ -1,7 +1,9 @@
-../Core/Src/loop.c:24:6:Loop	3
-../Core/Src/loop.c:46:6:ServoSetSpeed	3
-../Core/Src/loop.c:71:6:BufferProcess	3
-../Core/Src/loop.c:98:6:Calibrate	1
-../Core/Src/loop.c:103:6:CalibrateSpeed	2
-../Core/Src/loop.c:120:6:TurnOnLED	1
-../Core/Src/loop.c:124:6:TurnOffLED	1
+../Core/Src/loop.c:30:6:Loop	4
+../Core/Src/loop.c:56:7:ServoSetSpeed	4
+../Core/Src/loop.c:90:6:BufferProcess	3
+../Core/Src/loop.c:117:6:Servo1Control	2
+../Core/Src/loop.c:131:6:Servo2Control	2
+../Core/Src/loop.c:145:6:ResetServoValues	2
+../Core/Src/loop.c:157:6:CalibrateSpeed	2
+../Core/Src/loop.c:174:6:TurnOnLED	1
+../Core/Src/loop.c:178:6:TurnOffLED	1

@@ -7,18 +7,24 @@
 
 #include "loop.h"
 
-#define	ANGLE_STEP	1
+//#define	ANGLE_STEP	1
 
 extern uint8		data_received_flag;
+
 extern ServoMotor	servo_1,
 					servo_2;
+
 extern uint8		rx_buffer[RX_BUFFER_SIZE];
 
-ServoValues			servo_1_values;
-ServoValues			servo_2_values;
-
-//servo_1_values->previous_angle = 0;
 uint8				motor_number;
+
+ServoValues			servo_1_values 				= {0,0,0,0, SERVO_1_MIN_ANGLE, SERVO_1_MAX_ANGLE,0};
+ServoValues			servo_2_values 				= {0,0,0,0, SERVO_2_MIN_ANGLE, SERVO_2_MAX_ANGLE,0};
+
+uint8				set_motors_flag 			= 0;
+
+float				ANGLE_STEP					= 0.25;
+
 
 
 void Loop(void)
@@ -27,25 +33,29 @@ void Loop(void)
 	  {
 		  BufferProcess(rx_buffer);
 
-		  Calibrate(&servo_1_values);
-		  Calibrate(&servo_2_values);
+		  CalibrateSpeed(&servo_1_values);
+		  CalibrateSpeed(&servo_2_values);
+
+		  if (motor_number == MOTOR_NUMBER)
+		  {
+			  set_motors_flag = 1;
+		  }
 
 		  data_received_flag = 0;
 	  }
 
-	  if (motor_number == 2)
+	  if (set_motors_flag == 1)
 	  {
-
-		  ServoSetSpeed(&servo_1, &servo_1_values);
-		  ServoSetSpeed(&servo_2, &servo_2_values);
+		  Servo1Control(&servo_1, &servo_1_values);
+		  Servo2Control(&servo_2, &servo_2_values);
 	  }
 
 }
 
 
-void ServoSetSpeed(ServoMotor *servo,ServoValues *servo_values)
+uint8 ServoSetSpeed(ServoMotor *servo,ServoValues *servo_values)
 {
-	  if (HAL_GetTick() - servo_values->previous_millis > (servo_values->speed * 30))
+	  if (HAL_GetTick() - servo_values->previous_millis > (servo_values->speed * 10))
 	  {
 		  if (servo_values->previous_angle < servo_values->angle)
 		  {
@@ -57,14 +67,23 @@ void ServoSetSpeed(ServoMotor *servo,ServoValues *servo_values)
 		  }
 		  else
 		  {
-//			  printf("else--------motor_number %d :: angle = %d, previous_angle = %d \r\n",
+//			  printf("End Angle-------->motor_number %d :: angle = %d, previous_angle = %d \r\n",
 //					  servo_values->motor_number, servo_values->angle, servo_values->previous_angle);
 
-			  servo_values->previous_angle = servo_values->angle;
+			  if (servo_values->angle == (servo_values->MAX_ANGLE)/10) // end of angle(360")
+			  {
+				  return 0;
+			  }
+			  else
+			  {
+				  servo_values->previous_angle = servo_values->angle;
+			  }
 		  }
 
 		  servo_values->previous_millis = HAL_GetTick();
 	  }
+
+	  return 1;
 }
 
 
@@ -92,24 +111,59 @@ void BufferProcess(uint8 *buffer)
 //	 printf("data received succussfully, motor_number : %d, angle = %d, speed = %d \r\n",
 //			 buffer[0], buffer[1], buffer[2]);
 
-	 ResetRxBuffer();
+	ResetRxBuffer();
 }
 
-void Calibrate(ServoValues *servo_values)
+void Servo1Control(ServoMotor *servo, ServoValues *servo_values)
 {
-	CalibrateSpeed(servo_values->speed);
-}
+	uint8 end_pivot;
 
-void CalibrateSpeed(uint8 speed)
-{
-	if (speed < MIN_SPEED)
+	end_pivot = ServoSetSpeed(servo, servo_values);
+
+	if (end_pivot == 0)
 	{
-		speed = MIN_SPEED;
+		  servo_values->previous_angle = servo_values->MIN_ANGLE;
+		  ServoSetAngle(servo, servo_values->previous_angle);
+		  set_motors_flag = 0;
+	}
+}
+
+void Servo2Control(ServoMotor *servo, ServoValues *servo_values)
+{
+	uint8 end_pivot;
+
+	end_pivot = ServoSetSpeed(servo, servo_values);
+
+	if (end_pivot == 0)
+	{
+		  servo_values->previous_angle = servo_values->MIN_ANGLE;
+		  ServoSetAngle(servo, servo_values->previous_angle);
+		  set_motors_flag = 0;
+	}
+}
+
+void ResetServoValues(ServoMotor *servo, ServoValues *servo_values)
+{
+	for(int i = servo_values->MAX_ANGLE; i > servo_values->MIN_ANGLE ; i--)
+	{
+		ServoSetAngle(servo, i);
+		HAL_Delay(100);
 	}
 
-	if (speed > MAX_SPEED)
+	servo_values->previous_angle = servo_values->MIN_ANGLE;
+	set_motors_flag = 0;
+}
+
+void CalibrateSpeed(ServoValues *servo_values)
+{
+	if (servo_values->speed < MIN_SPEED)
 	{
-		speed = MAX_SPEED;
+		servo_values->speed = MIN_SPEED;
+	}
+
+	if (servo_values->speed > MAX_SPEED)
+	{
+		servo_values->speed = MAX_SPEED;
 	}
 }
 
