@@ -47,6 +47,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	}
 }
 
+
 void ResetRxBuffer(void)
 {
 	memset(rx_buffer , 0 ,RX_BUFFER_SIZE);

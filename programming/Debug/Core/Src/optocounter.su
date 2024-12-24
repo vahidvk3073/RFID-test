@@ -1,0 +1,2 @@
+../Core/Src/optocounter.c:11:6:HAL_GPIO_EXTI_Callback	16	static
+../Core/Src/optocounter.c:24:7:OptocounterNumber	4	static

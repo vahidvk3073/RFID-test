@@ -1,5 +1,6 @@
 "./Core/Src/loop.o"
 "./Core/Src/main.o"
+"./Core/Src/optocounter.o"
 "./Core/Src/serial.o"
 "./Core/Src/servo_functions.o"
 "./Core/Src/stm32f1xx_hal_msp.o"

@@ -1,2 +1,4 @@
 ../Core/Src/servo_functions.c:11:6:ServoSetAngle	1
-../Core/Src/servo_functions.c:24:8:CalibrateAngle	2
+../Core/Src/servo_functions.c:24:6:DS04ServoSetPulse	1
+../Core/Src/servo_functions.c:29:6:DS04CheckState	2
+../Core/Src/servo_functions.c:40:8:CalibrateAngle	2

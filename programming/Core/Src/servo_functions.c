@@ -5,7 +5,7 @@
  *      Author: vahid
  */
 
-#include "main.h"
+
 #include "servo_functions.h"
 
 void ServoSetAngle(ServoMotor *servo, float angle)//add SERVO_1_MIN_ANGLE and 2 and.. with ServoValues pointer
@@ -19,6 +19,22 @@ void ServoSetAngle(ServoMotor *servo, float angle)//add SERVO_1_MIN_ANGLE and 2 
 			+ servo->min_pulse;
 
 	*(servo->channel) = pulse;
+}
+
+void DS04ServoSetPulse(ServoMotor *servo, uint32 pulse)
+{
+	*(servo->channel) = pulse;
+}
+
+void DS04CheckState(ServoMotor *servo, ServoValues *servo_values, uint8 optocounter_number)
+{
+	DS04ServoSetPulse(servo, DS04_SPEED_SLOW);
+
+	if (OptocounterNumber() == optocounter_number)
+	{
+		DS04ServoSetPulse(servo, DS04_STOP);
+		printf("servo motor stopped at %d angle \r\n", 6 * OptocounterNumber());
+	}
 }
 
 uint16 CalibrateAngle(float angle)

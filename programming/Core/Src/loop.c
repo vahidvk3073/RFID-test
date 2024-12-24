@@ -7,14 +7,13 @@
 
 #include "loop.h"
 
-//#define	ANGLE_STEP	1
 
 extern uint8		data_received_flag;
 
-extern ServoMotor	servo_1,
-					servo_2;
-
 extern uint8		rx_buffer[RX_BUFFER_SIZE];
+
+ServoMotor			servo_1						= {&TIM2->CCR1, SERVO_1_MIN_PULSE, SERVO_1_MAX_PULSE};
+ServoMotor			servo_2						= {&TIM2->CCR2, SERVO_2_MIN_PULSE, SERVO_2_MAX_PULSE};
 
 uint8				motor_number;
 
@@ -23,7 +22,7 @@ ServoValues			servo_2_values 				= {0,0,0,0, SERVO_2_MIN_ANGLE, SERVO_2_MAX_ANGL
 
 uint8				set_motors_flag 			= 0;
 
-float				ANGLE_STEP					= 0.25;
+float				ANGLE_STEP					= 1;
 
 
 
@@ -33,8 +32,7 @@ void Loop(void)
 	  {
 		  BufferProcess(rx_buffer);
 
-		  CalibrateSpeed(&servo_1_values);
-		  CalibrateSpeed(&servo_2_values);
+//		  CalibrateSpeed(&servo_2_values);
 
 		  if (motor_number == MOTOR_NUMBER)
 		  {
@@ -46,12 +44,59 @@ void Loop(void)
 
 	  if (set_motors_flag == 1)
 	  {
-		  Servo1Control(&servo_1, &servo_1_values);
-		  Servo2Control(&servo_2, &servo_2_values);
+		  DS04HandleAngle(&servo_1, &servo_1_values);
 	  }
+}
+
+void DS04HandleAngle(ServoMotor *servo, ServoValues *servo_values)
+{
+	uint8 angle;
+	angle = servo_values->angle;
+
+	switch(angle)
+	{
+	case ANGLE_0:
+		DS04CheckState(servo, servo_values, COUNTER_NUMBER_0);
+		break;
+
+	case ANGLE_60:
+		DS04CheckState(servo, servo_values, COUNTER_NUMBER_60);
+		break;
+
+	case ANGLE_120:
+		DS04CheckState(servo, servo_values, COUNTER_NUMBER_120);
+		break;
+
+	case ANGLE_180:
+		DS04CheckState(servo, servo_values, COUNTER_NUMBER_180);
+		break;
+
+	case ANGLE_240:
+		DS04CheckState(servo, servo_values, COUNTER_NUMBER_240);
+		break;
+
+	case ANGLE_300:
+		DS04CheckState(servo, servo_values, COUNTER_NUMBER_300);
+		break;
+	}
+
 
 }
 
+
+void ServoControl(ServoMotor *servo, ServoValues *servo_values)
+{
+	uint8 end_pivot;
+
+	end_pivot = ServoSetSpeed(servo, servo_values);
+
+	if (end_pivot == 0)
+	{
+		  servo_values->previous_angle = servo_values->MIN_ANGLE;
+		  ServoSetAngle(servo, servo_values->previous_angle);
+		  set_motors_flag = 0;
+	}
+}
 
 uint8 ServoSetSpeed(ServoMotor *servo,ServoValues *servo_values)
 {
@@ -59,7 +104,7 @@ uint8 ServoSetSpeed(ServoMotor *servo,ServoValues *servo_values)
 	  {
 		  if (servo_values->previous_angle < servo_values->angle)
 		  {
-//			  printf("motor_number %d :: angle = %d, previous_angle = %d \r\n",
+//			  printf("motor_number %d :: angle = %d, previous_angle = %0.2f \r\n",
 //					  servo_values->motor_number,servo_values->angle, servo_values->previous_angle);
 
 			  ServoSetAngle(servo, servo_values->previous_angle);
@@ -67,7 +112,7 @@ uint8 ServoSetSpeed(ServoMotor *servo,ServoValues *servo_values)
 		  }
 		  else
 		  {
-//			  printf("End Angle-------->motor_number %d :: angle = %d, previous_angle = %d \r\n",
+//			  printf("End Angle-------->motor_number %d :: angle = %d, previous_angle = %0.2f \r\n",
 //					  servo_values->motor_number, servo_values->angle, servo_values->previous_angle);
 
 			  if (servo_values->angle == (servo_values->MAX_ANGLE)/10) // end of angle(360")
@@ -85,7 +130,6 @@ uint8 ServoSetSpeed(ServoMotor *servo,ServoValues *servo_values)
 
 	  return 1;
 }
-
 
 void BufferProcess(uint8 *buffer)
 {
@@ -114,34 +158,6 @@ void BufferProcess(uint8 *buffer)
 	ResetRxBuffer();
 }
 
-void Servo1Control(ServoMotor *servo, ServoValues *servo_values)
-{
-	uint8 end_pivot;
-
-	end_pivot = ServoSetSpeed(servo, servo_values);
-
-	if (end_pivot == 0)
-	{
-		  servo_values->previous_angle = servo_values->MIN_ANGLE;
-		  ServoSetAngle(servo, servo_values->previous_angle);
-		  set_motors_flag = 0;
-	}
-}
-
-void Servo2Control(ServoMotor *servo, ServoValues *servo_values)
-{
-	uint8 end_pivot;
-
-	end_pivot = ServoSetSpeed(servo, servo_values);
-
-	if (end_pivot == 0)
-	{
-		  servo_values->previous_angle = servo_values->MIN_ANGLE;
-		  ServoSetAngle(servo, servo_values->previous_angle);
-		  set_motors_flag = 0;
-	}
-}
-
 void ResetServoValues(ServoMotor *servo, ServoValues *servo_values)
 {
 	for(int i = servo_values->MAX_ANGLE; i > servo_values->MIN_ANGLE ; i--)
@@ -167,14 +183,11 @@ void CalibrateSpeed(ServoValues *servo_values)
 	}
 }
 
-
-
-
-
 void TurnOnLED(void)
 {
 	HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
 }
+
 void TurnOffLED(void)
 {
 	HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
