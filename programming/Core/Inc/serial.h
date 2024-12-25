@@ -12,9 +12,10 @@
 #include "Types.h"
 #include "stdio.h"
 
-#define		RX_BUFFER_SIZE	3
+#define		RX_BUFFER_SIZE	4
 
 extern UART_HandleTypeDef huart1;
+extern UART_HandleTypeDef huart2;
 
 /*macro define for printf*/
 #ifdef __GNUC__

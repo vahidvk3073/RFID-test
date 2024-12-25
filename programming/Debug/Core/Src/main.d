@@ -25,8 +25,8 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h \
  ../Core/Inc/serial.h ../Core/Inc/Types.h ../Core/Inc/servo_functions.h \
- ../Core/Inc/main.h ../Core/Inc/optocounter.h ../Core/Inc/loop.h \
- ../Core/Inc/servo_functions.h ../Core/Inc/serial.h
+ ../Core/Inc/main.h ../Core/Inc/optocounter.h ../Core/Inc/serial.h \
+ ../Core/Inc/loop.h ../Core/Inc/servo_functions.h
 ../Core/Inc/main.h:
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h:
 ../Core/Inc/stm32f1xx_hal_conf.h:
@@ -58,6 +58,6 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Core/Inc/servo_functions.h:
 ../Core/Inc/main.h:
 ../Core/Inc/optocounter.h:
+../Core/Inc/serial.h:
 ../Core/Inc/loop.h:
 ../Core/Inc/servo_functions.h:
-../Core/Inc/serial.h:

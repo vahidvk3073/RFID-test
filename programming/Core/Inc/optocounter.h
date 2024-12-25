@@ -10,8 +10,10 @@
 
 #include "stm32f1xx_hal.h"
 #include "Types.h"
+#include "serial.h"
 
 void	HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
+void	HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim);
 uint8	OptocounterNumber(void);
 
 #endif /* INC_OPTOCOUNTER_H_ */

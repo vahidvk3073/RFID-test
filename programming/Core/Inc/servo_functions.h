@@ -66,7 +66,7 @@ typedef struct
 
 void	ServoSetAngle(ServoMotor *servo, float angle);
 void	DS04ServoSetPulse(ServoMotor *servo, uint32 pulse);
-void	DS04CheckState(ServoMotor *servo, ServoValues *servo_values, uint8 optocounter_number);
+uint8	DS04CheckState(ServoMotor *servo, ServoValues *servo_values, uint8 optocounter_number);
 uint16	CalibrateAngle(float angle);
 
 #endif /* INC_SERVO_FUNCTIONS_H_ */
