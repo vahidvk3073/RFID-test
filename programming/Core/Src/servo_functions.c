@@ -33,16 +33,14 @@ uint8 DS04CheckState(ServoMotor *servo, ServoValues *servo_values, uint8 optocou
 	if (OptocounterNumber() == optocounter_number)
 	{
 		DS04ServoSetPulse(servo, DS04_STOP);
-
-		char buffer[70] ;
-		sprintf(buffer,"servo motor stopped success at %d angle \r\n", 60 * OptocounterNumber());
-		HAL_UART_Transmit(&huart2, (uint8 *)buffer, sizeof(buffer), 0xFFFF);
+		printf("stopped at %d angle\r\n",servo_values->angle * 60);
 
 		return 0;
 	}
 	else
 	{
 		DS04ServoSetPulse(servo, DS04_SPEED_SLOW);
+
 		return 1;
 	}
 }

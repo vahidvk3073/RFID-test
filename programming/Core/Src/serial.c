@@ -58,7 +58,7 @@ void ResetRxBuffer(void)
 /*function for define printf*/
 PUTCHAR_PROTOTYPE
 {
-  HAL_UART_Transmit(&huart1, (uint8 *)&ch, 1, 0xFFFF);
+  HAL_UART_Transmit(&huart2, (uint8 *)&ch, 1, 0xFFFF);
 
   return ch;
 }

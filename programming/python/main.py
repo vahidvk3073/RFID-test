@@ -37,12 +37,15 @@ print('start after 5 second...')
 for i in range(0, 5):
     print(f'{5 - i} \r\n')
     time.sleep(1)
+
+print('start\r\n')
+
 while True:
     for i in range(0, 31, 6):
 
-        # send data to motor 1
+        # send data to motor 1,0 is fastest,100 is slowest
         received_data = servo_motor_control(motor_1_angle=i, motor_1_speed=50,
-                                            motor_2_angle=6, motor_2_speed=50)
+                                            motor_2_angle=18, motor_2_speed=10)
 
         # if "servo motor stopped success" in received_data:
         #     set_servo_angle = True

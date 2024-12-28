@@ -28,7 +28,7 @@
 #define SERVO_2_MAX_PULSE	19500
 
 #define DS04_STOP			18500
-#define DS04_SPEED_SLOW		18450
+#define DS04_SPEED_SLOW		18400
 
 #define MOTOR_NUMBER		2
 

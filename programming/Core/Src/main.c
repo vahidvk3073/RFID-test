@@ -124,15 +124,12 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
+  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
 
   HAL_UART_Receive_DMA(&huart1, &rx_temp, 1);
 
-  TurnOnLED();
-  HAL_Delay(1000);
-  TurnOffLED();
+  printf("check uart \r\n");
 
-//  printf("check uart \r\n");
-  HAL_UART_Transmit(&huart2, (uint8 *)"check uart \r\n", sizeof("check uart \r\n"), 0xFFFF);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -396,14 +393,14 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, LED_Pin|LEDB8_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : LED_Pin LEDB8_Pin */
-  GPIO_InitStruct.Pin = LED_Pin|LEDB8_Pin;
+  /*Configure GPIO pin : LED_Pin */
+  GPIO_InitStruct.Pin = LED_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+  HAL_GPIO_Init(LED_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : PB9 */
   GPIO_InitStruct.Pin = GPIO_PIN_9;
