@@ -1,10 +1,18 @@
 import serial
 import time
 import struct
+from datetime import datetime
 
 file_path = 'C:\ARM\Star5Lock\RFIDtest\output.txt'
 
-tag_numbers = [111, 222, 333, 444, 555, 666]
+tag_numbers = [
+    "4327D7B663",
+    "43AB18C683",
+    "4341F63617",
+    "4345F68C27",
+    "43E0054DC6",
+    "4394CE667D"
+]
 
 # function for send motor number,angle and speed
 
@@ -31,8 +39,9 @@ def servo_motor_control(motor_1_angle, motor_1_speed, motor_2_angle, motor_2_spe
 servo_serial = serial.Serial(
     port='COM3', baudrate=115200, timeout=1)
 
-# RFIDreader_serial = serial.Serial(
-#     serial_port='COM4', baudrate=115200, timeout=1)
+RFIDreader_serial = serial.Serial(
+    port='COM8', baudrate=9600, timeout=1)
+
 print('start after 5 second...')
 for i in range(0, 5):
     print(f'{5 - i} \r\n')
@@ -40,28 +49,44 @@ for i in range(0, 5):
 
 print('start\r\n')
 
+angle = 0
+index = 0
+
 while True:
-    for i in range(0, 31, 6):
 
-        # send data to motor 1,0 is fastest,100 is slowest
-        received_data = servo_motor_control(motor_1_angle=i, motor_1_speed=50,
-                                            motor_2_angle=18, motor_2_speed=10)
+    # send data to motors, 0 is fastest,100 is slowest
+    received_data = servo_motor_control(motor_1_angle=angle, motor_1_speed=50,
+                                        motor_2_angle=12, motor_2_speed=5)
 
-        # if "servo motor stopped success" in received_data:
-        #     set_servo_angle = True
 
-        # while RFIDreader_serial.in_waiting >= 12:
-        #     RFID_tag_number = RFIDreader_serial.read(12)
+    if RFIDreader_serial.in_waiting > 0:
 
-        # if (RFID_tag_number == tag_numbers[i/6]):
-        #     with open(file_path, 'a') as file:
-        #         file.write("OK\n")
-        # else:
-        #     with open(file_path, 'a') as file:
-        #         file.write("WRONG\n")
+        data = RFIDreader_serial.read(5)
 
-        # if "data received succussfully" in received_data:
-        #     print(f'succussfully sent to motor 2')
-        #     print('============================================')
+        received_card = data.hex().upper()
 
-        time.sleep(10)
+        print(f'received_card : {received_card}\n')
+
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        if str(received_card) == tag_numbers[index]:
+            result = "OK\n"
+            print('OK')
+        else:
+            result = "WRONG\n"
+            print('WRONG')
+
+        with open(file_path, 'a') as file:
+            file.write(
+                f"{timestamp} | Received: {received_card} | List[{index}]:{tag_numbers[index]} | Result: {result}\n"
+            )
+
+    angle = angle + 6
+    if (angle == 36):
+        angle = 0
+
+    index = index + 1
+    if (index == 6):
+        index = 0
+
+    time.sleep(10)

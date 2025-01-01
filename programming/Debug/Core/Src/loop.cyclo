@@ -1,9 +1,9 @@
 ../Core/Src/loop.c:30:6:Loop	5
 ../Core/Src/loop.c:59:7:DS04HandleAngle	7
 ../Core/Src/loop.c:97:7:ServoControl	2
-../Core/Src/loop.c:117:7:ServoSetSpeed	3
-../Core/Src/loop.c:138:6:BufferProcess	1
-../Core/Src/loop.c:160:6:ResetServoValues	2
-../Core/Src/loop.c:172:6:CalibrateSpeed	2
-../Core/Src/loop.c:185:6:TurnOnLED	1
-../Core/Src/loop.c:190:6:TurnOffLED	1
+../Core/Src/loop.c:120:7:ServoSetSpeed	3
+../Core/Src/loop.c:141:6:BufferProcess	1
+../Core/Src/loop.c:165:6:ResetServoValues	2
+../Core/Src/loop.c:176:6:CalibrateSpeed	2
+../Core/Src/loop.c:189:6:TurnOnLED	1
+../Core/Src/loop.c:194:6:TurnOffLED	1

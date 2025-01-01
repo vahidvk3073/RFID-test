@@ -33,7 +33,7 @@ uint8 DS04CheckState(ServoMotor *servo, ServoValues *servo_values, uint8 optocou
 	if (OptocounterNumber() == optocounter_number)
 	{
 		DS04ServoSetPulse(servo, DS04_STOP);
-		printf("stopped at %d angle\r\n",servo_values->angle * 60);
+		printf("stopped at %d angle\r\n",servo_values->angle * 10);
 
 		return 0;
 	}

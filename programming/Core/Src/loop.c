@@ -23,7 +23,7 @@ ServoValues			servo_2_values 				= {0,0,0,0, SERVO_2_MIN_ANGLE, SERVO_2_MAX_ANGL
 uint8				run_motors_flag 			= 0;
 uint8				DS04_is_running				= 1;
 
-float				ANGLE_STEP					= 0.5;
+float				ANGLE_STEP					= 1;
 
 
 
@@ -102,11 +102,14 @@ uint8 ServoControl(ServoMotor *servo, ServoValues *servo_values)
 
 	if (end_pivot == 0)
 	{
-		ServoSetAngle(servo, servo_values->MIN_ANGLE);
+		ResetServoValues(servo, servo_values);
+//		ServoSetAngle(servo, servo_values->MIN_ANGLE);
 
 		servo_values->previous_angle = servo_values->MIN_ANGLE;
 
 		printf("end_pivot\r\n");
+
+
 
 		return 0;
 	}
@@ -147,26 +150,27 @@ void BufferProcess(uint8 *buffer)
 	servo_2_values.speed = buffer[3];
 	servo_2_values.previous_millis = HAL_GetTick();
 
-	//send ACK data to PC
-	HAL_UART_Transmit(&huart1, (uint8 *)"received\r\n", sizeof("received\r\n"), 0xFFFF);
+
 
 	//debug
 	printf("===============\r\n motor_1_angle = %d, motor_1_speed = %d ***"
 			 " motor_2_angle = %d, motor_2_speed = %d \r\n",buffer[0], buffer[1], buffer[2], buffer[3]);
+
+	//send ACK data to PC
+	HAL_UART_Transmit(&huart1, (uint8 *)"received\r\n", sizeof("received\r\n"), 0xFFFF);
 
 	ResetRxBuffer();
 }
 
 void ResetServoValues(ServoMotor *servo, ServoValues *servo_values)
 {
-	for(int i = servo_values->MAX_ANGLE; i > servo_values->MIN_ANGLE ; i--)
+	for(int i = servo_values->angle; i > servo_values->MIN_ANGLE ; i--)
 	{
 		ServoSetAngle(servo, i);
 		HAL_Delay(100);
 	}
 
 	servo_values->previous_angle = servo_values->MIN_ANGLE;
-	run_motors_flag = 0;
 }
 
 void CalibrateSpeed(ServoValues *servo_values)

@@ -1,9 +1,9 @@
 ../Core/Src/loop.c:30:6:Loop	8	static
 ../Core/Src/loop.c:59:7:DS04HandleAngle	24	static
 ../Core/Src/loop.c:97:7:ServoControl	24	static
-../Core/Src/loop.c:117:7:ServoSetSpeed	24	static
-../Core/Src/loop.c:138:6:BufferProcess	24	static
-../Core/Src/loop.c:160:6:ResetServoValues	24	static
-../Core/Src/loop.c:172:6:CalibrateSpeed	16	static
-../Core/Src/loop.c:185:6:TurnOnLED	8	static
-../Core/Src/loop.c:190:6:TurnOffLED	8	static
+../Core/Src/loop.c:120:7:ServoSetSpeed	24	static
+../Core/Src/loop.c:141:6:BufferProcess	24	static
+../Core/Src/loop.c:165:6:ResetServoValues	24	static
+../Core/Src/loop.c:176:6:CalibrateSpeed	16	static
+../Core/Src/loop.c:189:6:TurnOnLED	8	static
+../Core/Src/loop.c:194:6:TurnOffLED	8	static
