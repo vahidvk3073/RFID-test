@@ -17,16 +17,20 @@ tag_numbers = [
 # function for send motor number,angle and speed
 
 
-def servo_motor_control(motor_1_angle, motor_1_speed, motor_2_angle, motor_2_speed):
+def servo_motor_control(motor_number, motor_angle, motor_speed):
     START_BYTE = 0xFF
     STOP_BYTE = 0x0A
 
     received_data = 0
 
-    m_packet = struct.pack('<BBBBBB', START_BYTE,
-                           motor_1_angle, motor_1_speed, motor_2_angle, motor_2_speed, STOP_BYTE)
+    print(f"Motor Angle: {motor_angle}")
+
+    m_packet = struct.pack('<BBBBB', START_BYTE,
+                           motor_number, motor_angle, motor_speed, STOP_BYTE)
 
     servo_serial.write(m_packet)
+
+    print(f"Packet: {m_packet}")
 
     if servo_serial.in_waiting > 0:
         received_data = servo_serial.readline().decode()
@@ -40,7 +44,7 @@ servo_serial = serial.Serial(
     port='COM3', baudrate=115200, timeout=1)
 
 RFIDreader_serial = serial.Serial(
-    port='COM8', baudrate=9600, timeout=1)
+    port='COM12', baudrate=9600, timeout=1)
 
 print('start after 5 second...')
 for i in range(0, 5):
@@ -52,13 +56,20 @@ print('start\r\n')
 angle = 0
 index = 0
 
+send_data_to_motors = 1
+
 while True:
-
     # send data to motors, 0 is fastest,100 is slowest
-    received_data = servo_motor_control(motor_1_angle=angle, motor_1_speed=50,
-                                        motor_2_angle=12, motor_2_speed=5)
+    if send_data_to_motors == 1:
+        servo_motor_control(motor_number=1, motor_angle=angle, motor_speed=50)
 
+        time.sleep(0.2)
 
+        servo_motor_control(motor_number=2, motor_angle=13, motor_speed=5)
+
+        send_data_to_motors = 0
+
+    #ready to read rfid reader tag number
     if RFIDreader_serial.in_waiting > 0:
 
         data = RFIDreader_serial.read(5)
@@ -78,15 +89,17 @@ while True:
 
         with open(file_path, 'a') as file:
             file.write(
-                f"{timestamp} | Received: {received_card} | List[{index}]:{tag_numbers[index]} | Result: {result}\n"
+                f"{timestamp} | Received: {received_card} | List[{index}]: {tag_numbers[index]} | Result: {result}\n"
             )
 
-    angle = angle + 6
-    if (angle == 36):
-        angle = 0
+        angle = angle + 6
+        if (angle == 36):
+            angle = 0
 
-    index = index + 1
-    if (index == 6):
-        index = 0
+        index = index + 1
+        if (index == 6):
+            index = 0
 
-    time.sleep(10)
+        send_data_to_motors = 1
+
+        time.sleep(7)

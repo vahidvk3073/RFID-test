@@ -43,6 +43,43 @@ uint8 DS04CheckState(ServoMotor *servo, ServoValues *servo_values, uint8 optocou
 
 		return 1;
 	}
+//	const int COUNTER_MAX = 100;
+//
+//	uint32 counter,
+//		   wait;
+//	uint8 pin_status;
+//
+//	DS04ServoSetPulse(servo, DS04_SPEED_SLOW);
+//
+//	counter = 0;
+//	wait = 0;
+//
+//	while (counter < COUNTER_MAX)
+//	{
+//		pin_status = HAL_GPIO_ReadPin(OptoSensor_GPIO_Port, OptoSensor_Pin);
+//
+//		switch(pin_status)
+//		{
+//			case 0:
+//				counter = 0;
+//				break;
+//
+//			case 1:
+//				counter++;
+//				break;
+//		}
+//
+//		if (wait++ > 2000)
+//		{
+//			printf(" << ERROR >>\r\n");
+//		}
+//
+//		HAL_Delay(0);
+//	}
+//
+//	printf("stop\r\n");
+//	DS04ServoSetPulse(servo, DS04_STOP);
+//	return 0;
 }
 
 uint16 CalibrateAngle(float angle)

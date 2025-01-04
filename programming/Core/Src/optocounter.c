@@ -5,6 +5,7 @@
  *      Author: vahid
  */
 #include "optocounter.h"
+#include "main.h"
 
 #define DEBOUNCE_OPTOCOUNTER	50
 
@@ -13,9 +14,10 @@ uint8	debounce_flag		= 0;
 uint32	signal_counter		= 0;
 
 extern	TIM_HandleTypeDef htim3;
+
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-    if (GPIO_Pin == GPIO_PIN_9)
+    if (GPIO_Pin == OptoSensor_Pin)
     {
     	if (debounce_flag == 0)
     	{
@@ -30,7 +32,7 @@ void	HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
     if (htim->Instance == TIM3)
     {
-    	if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_9) == GPIO_PIN_RESET)
+    	if (HAL_GPIO_ReadPin(OptoSensor_GPIO_Port, OptoSensor_Pin) == GPIO_PIN_RESET)
     	{
     		signal_counter++;
 
@@ -42,6 +44,8 @@ void	HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     			{
     				optocounter_number = 1;
     			}
+
+    			printf("optocounter_number = %d \r\n", optocounter_number);
 
     			debounce_flag = 0;
 

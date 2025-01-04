@@ -29,7 +29,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 			receiving = 1;
 			buffer_index = 0;
 		}
-		else if (receiving == 1) //start receiving
+		else
+		if (receiving == 1) //start receiving
 		{
 			if (rx_temp == STOP_BYTE)
 			{
@@ -40,6 +41,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 			if (buffer_index < RX_BUFFER_SIZE)
 			{
 				rx_buffer[buffer_index] = rx_temp;
+//				printf("rx_buffer[%d] = %d \r\n", buffer_index, rx_temp);
 				buffer_index++;
 			}
 
@@ -50,7 +52,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
 void ResetRxBuffer(void)
 {
-	memset(rx_buffer , 0 ,RX_BUFFER_SIZE);
+	memset(rx_buffer, 0, RX_BUFFER_SIZE);
 	buffer_index = 0;
 }
 

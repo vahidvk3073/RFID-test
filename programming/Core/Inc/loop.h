@@ -19,7 +19,7 @@
 void	Loop(void);
 void	BufferProcess(uint8 *buffer);
 uint8	ServoSetSpeed(ServoMotor *servo, ServoValues *servo_values);
-void	CalibrateSpeed(ServoValues *servo_values);
+void	ValidateSpeed(ServoValues *servo_values);
 void	ResetServoValues(ServoMotor *servo, ServoValues *servo_values);
 uint8	ServoControl(ServoMotor *servo, ServoValues *servo_values);
 uint8	DS04HandleAngle(ServoMotor *servo, ServoValues *servo_values);

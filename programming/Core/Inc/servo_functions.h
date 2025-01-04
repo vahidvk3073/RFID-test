@@ -30,7 +30,7 @@
 #define DS04_STOP			18500
 #define DS04_SPEED_SLOW		18455
 
-#define MOTOR_NUMBER		2
+#define ALL_MOTOR_NUMBER		2
 
 #define	ANGLE_0				0
 #define	ANGLE_60			6
