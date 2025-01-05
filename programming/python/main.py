@@ -41,10 +41,10 @@ def servo_motor_control(motor_number, motor_angle, motor_speed):
 
 # main program
 servo_serial = serial.Serial(
-    port='COM3', baudrate=115200, timeout=1)
+    port='COM8', baudrate=115200, timeout=1)
 
-RFIDreader_serial = serial.Serial(
-    port='COM12', baudrate=9600, timeout=1)
+# RFIDreader_serial = serial.Serial(
+#     port='COM12', baudrate=9600, timeout=1)
 
 print('start after 5 second...')
 for i in range(0, 5):
@@ -67,39 +67,43 @@ while True:
 
         servo_motor_control(motor_number=2, motor_angle=13, motor_speed=5)
 
-        send_data_to_motors = 0
-
-    #ready to read rfid reader tag number
-    if RFIDreader_serial.in_waiting > 0:
-
-        data = RFIDreader_serial.read(5)
-
-        received_card = data.hex().upper()
-
-        print(f'received_card : {received_card}\n')
-
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-        if str(received_card) == tag_numbers[index]:
-            result = "OK\n"
-            print('OK')
-        else:
-            result = "WRONG\n"
-            print('WRONG')
-
-        with open(file_path, 'a') as file:
-            file.write(
-                f"{timestamp} | Received: {received_card} | List[{index}]: {tag_numbers[index]} | Result: {result}\n"
-            )
-
         angle = angle + 6
         if (angle == 36):
             angle = 0
+            
+        # send_data_to_motors = 0
 
-        index = index + 1
-        if (index == 6):
-            index = 0
+    #ready to read rfid reader tag number
+    # if RFIDreader_serial.in_waiting > 0:
 
-        send_data_to_motors = 1
+    #     data = RFIDreader_serial.read(5)
+
+    #     received_card = data.hex().upper()
+
+    #     print(f'received_card : {received_card}\n')
+
+    #     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    #     if str(received_card) == tag_numbers[index]:
+    #         result = "OK\n"
+    #         print('OK')
+    #     else:
+    #         result = "WRONG\n"
+    #         print('WRONG')
+
+    #     with open(file_path, 'a') as file:
+    #         file.write(
+    #             f"{timestamp} | Received: {received_card} | List[{index}]: {tag_numbers[index]} | Result: {result}\n"
+    #         )
+
+    #     angle = angle + 6
+    #     if (angle == 36):
+    #         angle = 0
+
+    #     index = index + 1
+    #     if (index == 6):
+    #         index = 0
+
+    #     send_data_to_motors = 1
 
         time.sleep(7)

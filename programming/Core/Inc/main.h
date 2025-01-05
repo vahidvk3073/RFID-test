@@ -63,7 +63,6 @@ void Error_Handler(void);
 #define LED_GPIO_Port GPIOB
 #define OptoSensor_Pin GPIO_PIN_9
 #define OptoSensor_GPIO_Port GPIOB
-#define OptoSensor_EXTI_IRQn EXTI9_5_IRQn
 
 /* USER CODE BEGIN Private defines */
 

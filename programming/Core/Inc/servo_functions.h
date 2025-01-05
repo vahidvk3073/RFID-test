@@ -10,7 +10,7 @@
 
 #include "Types.h"
 #include "main.h"
-#include "optocounter.h"
+//#include "optocounter.h"
 
 #define SERVO_1_MIN_ANGLE	0
 #define SERVO_1_MAX_ANGLE	360
