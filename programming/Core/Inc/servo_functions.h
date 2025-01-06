@@ -61,12 +61,11 @@ typedef struct
 	uint8	speed;
 	uint8	MIN_ANGLE;
 	uint16	MAX_ANGLE;
-	uint32	previous_millis;
 }ServoValues;
 
 void	ServoSetAngle(ServoMotor *servo, float angle);
 void	DS04ServoSetPulse(ServoMotor *servo, uint32 pulse);
-uint8	DS04CheckState(ServoMotor *servo, ServoValues *servo_values, uint8 optocounter_number);
+uint8	DS04CheckState(ServoMotor *servo, ServoValues *servo_values);
 uint16	CalibrateAngle(float angle);
 
 #endif /* INC_SERVO_FUNCTIONS_H_ */

@@ -17,11 +17,11 @@ ServoMotor			servo_2						= {&TIM2->CCR2, SERVO_2_MIN_PULSE, SERVO_2_MAX_PULSE};
 
 uint8				motor_number;
 
-ServoValues			servo_1_values 				= {0,0,0,0, SERVO_1_MIN_ANGLE, SERVO_1_MAX_ANGLE,0};
-ServoValues			servo_2_values 				= {0,0,0,0, SERVO_2_MIN_ANGLE, SERVO_2_MAX_ANGLE,0};
+ServoValues			servo_1_values 				= {0,0,0,0, SERVO_1_MIN_ANGLE, SERVO_1_MAX_ANGLE};
+ServoValues			servo_2_values 				= {0,0,0,0, SERVO_2_MIN_ANGLE, SERVO_2_MAX_ANGLE};
 
 uint8				run_motors_flag 			= 0;
-uint8				DS04_is_running				= 1;
+//uint8				DS04_is_running				= 1;
 
 float				ANGLE_STEP					= 1;
 
@@ -36,114 +36,70 @@ void Loop(void)
 		  ValidateSpeed(&servo_1_values);
 		  ValidateSpeed(&servo_2_values);
 
-		  if(motor_number == ALL_MOTOR_NUMBER)
-		  {
-			  run_motors_flag = 1;
-
-			  DS04_is_running = 1;
-		  }
+		  run_motors_flag = 1;
 
 		  data_received_flag = 0;
 	  }
 
 	  if (run_motors_flag == 1)
 	  {
-		  switch(DS04_is_running)
+		  switch(motor_number)
 		  {
-		  	  case 0:
-		  		run_motors_flag = ServoControl(&servo_2, &servo_2_values);
+		  	  case 1:
+		  		DS04HandleAngle(&servo_1, &servo_1_values);
+		  		run_motors_flag = 0;
 		  		break;
 
-		  	  case 1:
-		  		DS04_is_running = DS04HandleAngle(&servo_1, &servo_1_values);
+		  	  case 2:
+		  		ServoControl(&servo_2, &servo_2_values);
+		  		run_motors_flag = 0;
 		  		break;
 		  }
 	  }
 }
 
-uint8 DS04HandleAngle(ServoMotor *servo, ServoValues *servo_values)
+void DS04HandleAngle(ServoMotor *servo, ServoValues *servo_values)
 {
 	uint8 return_value;
 
-	uint8 angle;
-	angle = servo_values->angle;
+	return_value = DS04CheckState(servo, servo_values);
 
-	switch(angle)
+	if(return_value == 1)
 	{
-		case ANGLE_0:
-			return_value = DS04CheckState(servo, servo_values, COUNTER_NUMBER_0);
-			break;
-
-		case ANGLE_60:
-			return_value = DS04CheckState(servo, servo_values, COUNTER_NUMBER_60);
-			break;
-
-		case ANGLE_120:
-			return_value = DS04CheckState(servo, servo_values, COUNTER_NUMBER_120);
-			break;
-
-		case ANGLE_180:
-			return_value = DS04CheckState(servo, servo_values, COUNTER_NUMBER_180);
-			break;
-
-		case ANGLE_240:
-			return_value = DS04CheckState(servo, servo_values, COUNTER_NUMBER_240);
-			break;
-
-		case ANGLE_300:
-			return_value = DS04CheckState(servo, servo_values, COUNTER_NUMBER_300);
-			break;
-
-		default:
-			printf("wrong angle received\r\n");
+		HAL_UART_Transmit(&huart1, (uint8 *)"OK1\r\n", sizeof("OK1\r\n"), 0xFFFF);
 	}
-
-	return return_value;
+	else
+	{
+		HAL_UART_Transmit(&huart1, (uint8 *)"ERROR1\r\n", sizeof("ERROR1\r\n"), 0xFFFF);
+	}
 }
 
 
-uint8 ServoControl(ServoMotor *servo, ServoValues *servo_values)
+void ServoControl(ServoMotor *servo, ServoValues *servo_values)
 {
 	uint8 end_pivot;
 
 	end_pivot = ServoSetSpeed(servo, servo_values);
 
-	if (end_pivot == 0)
+	if (end_pivot == 1)
 	{
 		ResetServoValues(servo, servo_values);
 
 		servo_values->previous_angle = servo_values->MIN_ANGLE;
 
 		printf("end_pivot\r\n");
-
-		return 0;
 	}
-
-	return 1;
 }
 
 uint8 ServoSetSpeed(ServoMotor *servo,ServoValues *servo_values)
 {
-	  if (HAL_GetTick() - servo_values->previous_millis > (servo_values->speed * 10))
-	  {
-		  if (servo_values->previous_angle < servo_values->angle)
-		  {
-			  ServoSetAngle(servo, servo_values->previous_angle);
+	for(uint32 i = servo_values->MIN_ANGLE ; i < servo_values->angle ; i = i + ANGLE_STEP)
+	{
+		ServoSetAngle(servo, i);
+		HAL_Delay(servo_values->speed);
+	}
 
-			  servo_values->previous_angle = servo_values->previous_angle + ANGLE_STEP;
-		  }
-		  else // end of angle(360")
-		  {
-//			  printf("servo_values->previous_angle = %f,  servo_values->angle = %d \r\n",
-//					  servo_values->previous_angle, servo_values->angle);
-//			  servo_values->previous_angle = servo_values->angle;
-			  return 0;
-		  }
-
-		  servo_values->previous_millis = HAL_GetTick();
-	  }
-
-	  return 1;
+	return 1;
 }
 
 void BufferProcess(uint8 *buffer)
@@ -156,23 +112,25 @@ void BufferProcess(uint8 *buffer)
 			servo_1_values.motor_number = buffer[0];
 			servo_1_values.angle = buffer[1];
 			servo_1_values.speed = buffer[2];
-			servo_1_values.previous_millis = HAL_GetTick();
+
+			//debug
+			printf("===============\r\n motor_number = %d :: motor_angle = %d, motor_speed = %d \r\n",
+					servo_1_values.motor_number, servo_1_values.angle, servo_1_values.speed);
 			break;
 
 		case 2:
 			servo_2_values.motor_number = buffer[0];
 			servo_2_values.angle = buffer[1];
 			servo_2_values.speed = buffer[2];
-			servo_2_values.previous_millis = HAL_GetTick();
+
+			//send ACK data to PC
+			HAL_UART_Transmit(&huart1, (uint8 *)"OK2\r\n", sizeof("OK2\r\n"), 0xFFFF);
+
+			//debug
+			printf("===============\r\n motor_number = %d :: motor_angle = %d, motor_speed = %d \r\n",
+					servo_2_values.motor_number, servo_2_values.angle, servo_2_values.speed);
 			break;
 	}
-
-	//debug
-	printf("===============\r\n motor_number = %d :: motor_angle = %d, motor_speed = %d \r\n",
-			buffer[0], buffer[1], buffer[2]);
-
-	//send ACK data to PC
-//	HAL_UART_Transmit(&huart1, (uint8 *)"received\r\n", sizeof("received\r\n"), 0xFFFF);
 
 	ResetRxBuffer();
 }

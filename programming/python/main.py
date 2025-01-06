@@ -14,10 +14,14 @@ tag_numbers = [
     "4394CE667D"
 ]
 
-# function for send motor number,angle and speed
+previous_time = 0
+current_time = 0
 
+angle = 0
+index = 0
 
-def servo_motor_control(motor_number, motor_angle, motor_speed):
+# send motor number,angle and speed function
+def ServoMotorControl(motor_number, motor_angle, motor_speed):
     START_BYTE = 0xFF
     STOP_BYTE = 0x0A
 
@@ -30,21 +34,59 @@ def servo_motor_control(motor_number, motor_angle, motor_speed):
 
     servo_serial.write(m_packet)
 
-    print(f"Packet: {m_packet}")
+    # print(f"Packet: {m_packet}")
 
-    if servo_serial.in_waiting > 0:
-        received_data = servo_serial.readline().decode()
-        print(f"received message : {received_data}")
+    while True:
+        if servo_serial.in_waiting > 2:
+            received_data = servo_serial.readline().decode().strip()
+            print(f"received message : {received_data}")
+            break
 
     return received_data
 
+
+#check RFID Reader function
+def RFIDReaderCheck(index):
+    last_time = time.time()
+
+    while True:
+        #check if READER could not read TAG after 3 second
+        current_time = time.time()
+        
+        if (current_time - last_time) > 5:
+            return 0
+        
+        #check if READER could read TAG
+        if RFIDreader_serial.in_waiting > 4:
+
+            data = RFIDreader_serial.read(5)
+
+            received_card = data.hex().upper()
+
+            print(f'received_card : {received_card}\n')
+
+            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+            if str(received_card) == tag_numbers[index]:
+                result = "OK\n"
+                print('OK')
+            else:
+                result = "WRONG\n"
+                print('WRONG')
+
+            with open(file_path, 'a') as file:
+                file.write(
+                    f"{timestamp} | Received: {received_card} | List[{index}]: {tag_numbers[index]} | Result: {result}\n"
+                )
+
+            return 1
 
 # main program
 servo_serial = serial.Serial(
     port='COM8', baudrate=115200, timeout=1)
 
-# RFIDreader_serial = serial.Serial(
-#     port='COM12', baudrate=9600, timeout=1)
+RFIDreader_serial = serial.Serial(
+    port='COM11', baudrate=9600, timeout=1)
 
 print('start after 5 second...')
 for i in range(0, 5):
@@ -53,57 +95,75 @@ for i in range(0, 5):
 
 print('start\r\n')
 
-angle = 0
-index = 0
 
-send_data_to_motors = 1
+
+send_data_to_motor_1 = 1
+send_data_to_motor_2 = 0
 
 while True:
-    # send data to motors, 0 is fastest,100 is slowest
-    if send_data_to_motors == 1:
-        servo_motor_control(motor_number=1, motor_angle=angle, motor_speed=50)
+    # send data to motor 1 
+    if send_data_to_motor_1 == 1:
+        motor_1_received_data = ServoMotorControl(
+            motor_number=1, motor_angle=angle, motor_speed=50)
 
-        time.sleep(0.2)
+        #check motor state
+        status = motor_1_received_data.find("OK1")
 
-        servo_motor_control(motor_number=2, motor_angle=13, motor_speed=5)
+        if  status == -1:
+            print('motor 1 send command failed')
 
-        angle = angle + 6
-        if (angle == 36):
-            angle = 0
+            send_data_to_motor_1 = 0
+            send_data_to_motor_2 = 0
+        else :
+            send_data_to_motor_1 = 0
+            send_data_to_motor_2 = 1
             
-        # send_data_to_motors = 0
+            print('motor 1 send command success')
+            #angle for next reading
+            angle = angle + 6
+            if (angle == 36):
+                angle = 0
 
-    #ready to read rfid reader tag number
-    # if RFIDreader_serial.in_waiting > 0:
+    # send data to motor 2 -----> 0 ms is fastest,100 ms is slowest
+    if send_data_to_motor_2 == 1:
+        motor_2_received_data = ServoMotorControl(
+            motor_number=2, motor_angle=13, motor_speed=100)
 
-    #     data = RFIDreader_serial.read(5)
+        status = motor_2_received_data.find("OK2")
 
-    #     received_card = data.hex().upper()
+        if  status == -1:
+            print('motor 2 send command failed')
+            
+            #send motor 2 cammand again
+            send_data_to_motor_1 = 0
+            send_data_to_motor_2 = 1
+        else :
+            print('motor 2 send command success')
+            
+            is_read_card = RFIDReaderCheck(index)
 
-    #     print(f'received_card : {received_card}\n')
+            if is_read_card == 1:
+                #go to setting next angle
+                print('Well Done...!read TAG and data saved\n')
+                send_data_to_motor_1 = 1
+                send_data_to_motor_2 = 0
 
-    #     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                index = index + 1
+                if (index == 6):
+                    index = 0
+            else :
+                #RFID Reader could not read TAG, send motor 2 cammand again
+                print('TimeOUT!could not read TAG,try again\n')
+                send_data_to_motor_1 = 0
+                send_data_to_motor_2 = 1
 
-    #     if str(received_card) == tag_numbers[index]:
-    #         result = "OK\n"
-    #         print('OK')
-    #     else:
-    #         result = "WRONG\n"
-    #         print('WRONG')
+    if (send_data_to_motor_1 == 0 and send_data_to_motor_2 == 0):
+        print('oops...!stop process')
+    
+    time.sleep(7)
+    
+    RFIDreader_serial.reset_input_buffer()
 
-    #     with open(file_path, 'a') as file:
-    #         file.write(
-    #             f"{timestamp} | Received: {received_card} | List[{index}]: {tag_numbers[index]} | Result: {result}\n"
-    #         )
+ 
 
-    #     angle = angle + 6
-    #     if (angle == 36):
-    #         angle = 0
-
-    #     index = index + 1
-    #     if (index == 6):
-    #         index = 0
-
-    #     send_data_to_motors = 1
-
-        time.sleep(7)
+        

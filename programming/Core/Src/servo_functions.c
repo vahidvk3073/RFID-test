@@ -8,8 +8,6 @@
 
 #include "servo_functions.h"
 
-
-
 void ServoSetAngle(ServoMotor *servo, float angle)//add SERVO_1_MIN_ANGLE and 2 and.. with ServoValues pointer
 {
 	uint16 calibrated_angle;
@@ -28,7 +26,7 @@ void DS04ServoSetPulse(ServoMotor *servo, uint32 pulse)
 	*(servo->channel) = pulse;
 }
 
-uint8 DS04CheckState(ServoMotor *servo, ServoValues *servo_values, uint8 optocounter_number)
+uint8 DS04CheckState(ServoMotor *servo, ServoValues *servo_values)
 {
 	const int COUNTER_MAX = 100;
 
@@ -48,24 +46,28 @@ uint8 DS04CheckState(ServoMotor *servo, ServoValues *servo_values, uint8 optocou
 		switch(pin_status)
 		{
 			case 0:
-				counter = 0;
+				counter++;
 				break;
 
 			case 1:
-				counter++;
+				counter = 0;
 				break;
 		}
 
-		if (wait++ > 2000)
+		wait++;
+		if (wait > 4000)
 		{
 			printf(" << ERROR >>\r\n");
+
+			return 0;
 		}
 
 		HAL_Delay(0);
 	}
 
 	DS04ServoSetPulse(servo, DS04_STOP);
-	return 0;
+
+	return 1;
 }
 
 uint16 CalibrateAngle(float angle)
@@ -85,3 +87,4 @@ uint16 CalibrateAngle(float angle)
 
 	return c_angle;
 }
+
